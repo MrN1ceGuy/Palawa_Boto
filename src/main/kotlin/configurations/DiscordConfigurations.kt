@@ -23,7 +23,7 @@ object DiscordConfigurations {
                 "Default configuration created successfully, the program will now exit," +
                         " please set the default configuration values in the property file at $filePath"
             )
-            exitProcess(0)
+            exitProcess(1)
         }
     }
 
