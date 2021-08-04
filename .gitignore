@@ -29,5 +29,6 @@ hs_err_pid*
 build/
 !gradle-wrapper.jar
 
-# Project configurations #
+# Project configurations and metadata #
 config/
+userLeaderboard.txt
