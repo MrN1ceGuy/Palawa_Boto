@@ -1,7 +1,9 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.21'
     id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'application'
 }
+
 
 repositories {
     mavenCentral()
@@ -20,4 +22,4 @@ dependencies {
 //    kotlinOptions.jvmTarget = '1.8'
 //}
 
-//mainClassName = 'MainKt'
+mainClassName = 'MainKt'

@@ -16,9 +16,13 @@ suspend fun main() {
         commands("!joko ") {
             messageCreated { msg ->
                 if(msg.content.startsWith("praise joko!", ignoreCase = true)) {
-                    UsersLeaderboard.incrementScore(msg.author.id)
-                    msg.reply(handler.generateRandomImageResponse())
-                    msg.reply(handler.generateRandomTextResponse())
+                    if(UsersLeaderboard.incrementScore(msg.author.id)) {
+                        msg.reply(handler.generateRandomImageResponse())
+                        msg.reply(handler.generateRandomTextResponse())
+                    } else {
+                        msg.reply(handler.generateRandomImageResponse())
+                        msg.reply("**You useless servant, you already praised me today!**")
+                    }
                 }
             }
             command("loyalists") {
