@@ -1,9 +1,10 @@
-package configurations
+package handlers
 
 import models.UserLeaderboardData
 import java.io.File
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.collections.set
 
 object UsersLeaderboard {
     private const val FILE_NAME = "userLeaderboard.txt"
@@ -16,11 +17,16 @@ object UsersLeaderboard {
         }
     }
 
-    fun incrementScore(userId: String) : Boolean {
+    fun incrementScore(userId: String, userName: String): Boolean {
         if (leaderboard.containsKey(userId)) {
-            return if(isEligableForPraisingToday(leaderboard[userId]!!.lastPraiseDate)) {
+            return if (isEligibleForPraisingToday(leaderboard[userId]!!.lastPraiseDate)) {
                 leaderboard[userId]?.score?.incrementAndGet()
                 leaderboard[userId]?.lastPraiseDate = LocalDate.now()
+
+                if (leaderboard[userId]?.userName.isNullOrEmpty()) {
+                    leaderboard[userId]?.userName = userName
+                }
+
                 save()
 
                 true
@@ -31,7 +37,8 @@ object UsersLeaderboard {
             leaderboard[userId] = UserLeaderboardData(
                 id = userId,
                 score = AtomicInteger(1),
-                lastPraiseDate = LocalDate.now()
+                lastPraiseDate = LocalDate.now(),
+                userName = userName
             )
             save()
 
@@ -42,10 +49,16 @@ object UsersLeaderboard {
     fun generateTopTenMessage(): String {
         val sb = StringBuilder()
         val sortedPrintableLeaderboard = getSortedLeaderboardMap().map {
-            "<@${it.key}> with ${it.value.score} praises!"
+            val displayName = if(it.value.userName.isNullOrEmpty()) {
+                "<@${it.key}>"
+            } else {
+                it.value.userName
+            }
+
+            "$displayName with ${it.value.score} praises!"
         }
 
-        // We generating messages only for top 10, if there are less than 10 people who have praised, it will generate
+        // We're generating messages only for top 10, if there are less than 10 people who have praised, it will generate
         // a message for all the players in the leaderboard
         if (sortedPrintableLeaderboard.size >= 10) {
             for (i in 0..9) {
@@ -67,7 +80,7 @@ object UsersLeaderboard {
     private fun save() {
         val sb = StringBuilder()
         leaderboard.forEach {
-            sb.append("${it.key}|${it.value.score}|${it.value.lastPraiseDate.toEpochDay()}${System.lineSeparator()}")
+            sb.append("${it.key}|${it.value.score}|${it.value.lastPraiseDate.toEpochDay()}|${it.value.userName}${System.lineSeparator()}")
         }
         leaderboardFile.writeText(sb.toString())
     }
@@ -76,19 +89,23 @@ object UsersLeaderboard {
         leaderboardFile.forEachLine {
             val userData = it.split("|")
 
-            if (userData.size != 3) {
+            if (userData.size < 3) {
                 println("corrupted user data: $userData")
                 throw Exception("detected corrupted userdata, terminating...")
+            } else {
+                leaderboard[userData[0]] = UserLeaderboardData(
+                    id = userData[0],
+                    score = AtomicInteger(userData[1].toInt()),
+                    lastPraiseDate = LocalDate.ofEpochDay(userData[2].toLong())
+                )
+                if (userData.size == 4) {
+                    leaderboard[userData[0]]?.userName = userData[3]
+                }
             }
-            leaderboard[userData[0]] = UserLeaderboardData(
-                id = userData[0],
-                score = AtomicInteger(userData[1].toInt()),
-                lastPraiseDate = LocalDate.ofEpochDay(userData[2].toLong())
-            )
         }
     }
 
-    fun isEligableForPraisingToday(lastPraiseTime: LocalDate): Boolean {
+    private fun isEligibleForPraisingToday(lastPraiseTime: LocalDate): Boolean {
         return lastPraiseTime.plusDays(1).isBefore(LocalDate.now()) ||
                 lastPraiseTime.plusDays(1).isEqual(LocalDate.now())
     }

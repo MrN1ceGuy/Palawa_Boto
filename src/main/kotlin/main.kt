@@ -2,7 +2,7 @@ import com.jessecorbett.diskord.dsl.bot
 import com.jessecorbett.diskord.dsl.command
 import com.jessecorbett.diskord.dsl.commands
 import configurations.DiscordConfigurations
-import configurations.UsersLeaderboard
+import handlers.UsersLeaderboard
 import handlers.PalawaBotoHandler
 
 suspend fun main() {
@@ -16,7 +16,7 @@ suspend fun main() {
         commands("!joko ") {
             messageCreated { msg ->
                 if(msg.content.startsWith("praise joko!", ignoreCase = true)) {
-                    if(UsersLeaderboard.incrementScore(msg.author.id)) {
+                    if(UsersLeaderboard.incrementScore(msg.author.id, msg.author.username)) {
                         msg.reply(handler.generateRandomImageResponse())
                         msg.reply(handler.generateRandomTextResponse())
                     } else {
