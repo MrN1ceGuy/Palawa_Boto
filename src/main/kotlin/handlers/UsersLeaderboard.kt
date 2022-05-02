@@ -49,7 +49,7 @@ object UsersLeaderboard {
     fun generateTopTenMessage(): String {
         val sb = StringBuilder()
         val sortedPrintableLeaderboard = getSortedLeaderboardMap().map {
-            val displayName = if(it.value.userName.isNullOrEmpty()) {
+            val displayName = if (it.value.userName.isNullOrEmpty()) {
                 "<@${it.key}>"
             } else {
                 it.value.userName
@@ -93,20 +93,19 @@ object UsersLeaderboard {
                 println("corrupted user data: $userData")
                 throw Exception("detected corrupted userdata, terminating...")
             } else {
-                leaderboard[userData[0]] = UserLeaderboardData(
-                    id = userData[0],
+                leaderboard[userData.first()] = UserLeaderboardData(
+                    id = userData.first(),
                     score = AtomicInteger(userData[1].toInt()),
                     lastPraiseDate = LocalDate.ofEpochDay(userData[2].toLong())
                 )
                 if (userData.size == 4) {
-                    leaderboard[userData[0]]?.userName = userData[3]
+                    leaderboard[userData.first()]?.userName = userData[3]
                 }
             }
         }
     }
 
-    private fun isEligibleForPraisingToday(lastPraiseTime: LocalDate): Boolean {
-        return lastPraiseTime.plusDays(1).isBefore(LocalDate.now()) ||
+    private fun isEligibleForPraisingToday(lastPraiseTime: LocalDate): Boolean =
+        lastPraiseTime.plusDays(1).isBefore(LocalDate.now()) ||
                 lastPraiseTime.plusDays(1).isEqual(LocalDate.now())
-    }
 }

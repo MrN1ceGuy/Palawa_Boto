@@ -23,6 +23,10 @@ object DiscordConfigurations {
                 "Default configuration created successfully, the program will now exit," +
                         " please set the default configuration values in the property file at $filePath"
             )
+
+            // To trigger the Sources object for the sources files to be created (image urls and quotes)
+            Sources
+
             exitProcess(1)
         }
     }
