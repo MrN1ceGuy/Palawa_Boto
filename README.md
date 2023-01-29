@@ -23,3 +23,6 @@ Java 8 or above
 
 ## License
 This project is licensed under the GNU General Public License, for more information check out the full license [here](https://github.com/MrN1ceGuy/Palawa_Boto/blob/master/LICENSE)
+
+## Copyrights
+By using "Palawa Joko" character from the game Guild Wars insperation for this bot, all rights reserved to ArenaNet company.
